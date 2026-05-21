@@ -1,0 +1,59 @@
+\babel@toc {french}{}\relax 
+\contentsline {section}{\numberline {1}Introduction et présentation de la méthode}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Objectifs du projet}{1}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Choix du mini-projet}{1}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Présentation générale du jeu}{2}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}Règles du Puissance 4}{2}{subsubsection.1.3.1}%
+\contentsline {subsubsection}{\numberline {1.3.2}Modélisation du problème}{2}{subsubsection.1.3.2}%
+\contentsline {subsubsection}{\numberline {1.3.3}Contraintes du projet}{3}{subsubsection.1.3.3}%
+\contentsline {subsection}{\numberline {1.4}Méthode d'intelligence artificielle}{3}{subsection.1.4}%
+\contentsline {subsubsection}{\numberline {1.4.1}Principe de l'algorithme Min-Max}{3}{subsubsection.1.4.1}%
+\contentsline {subsubsection}{\numberline {1.4.2}Pseudo-code de Min-Max}{4}{subsubsection.1.4.2}%
+\contentsline {subsubsection}{\numberline {1.4.3}Limitation par profondeur}{4}{subsubsection.1.4.3}%
+\contentsline {subsection}{\numberline {1.5}Élagage alpha-bêta}{4}{subsection.1.5}%
+\contentsline {subsubsection}{\numberline {1.5.1}Motivation}{4}{subsubsection.1.5.1}%
+\contentsline {subsubsection}{\numberline {1.5.2}Définition de alpha et bêta}{4}{subsubsection.1.5.2}%
+\contentsline {subsubsection}{\numberline {1.5.3}Pseudo-code de alpha-bêta}{5}{subsubsection.1.5.3}%
+\contentsline {subsubsection}{\numberline {1.5.4}Intérêt pratique dans notre jeu}{5}{subsubsection.1.5.4}%
+\contentsline {subsection}{\numberline {1.6}Fonction heuristique d'évaluation}{5}{subsection.1.6}%
+\contentsline {subsubsection}{\numberline {1.6.1}Rôle de l'heuristique}{5}{subsubsection.1.6.1}%
+\contentsline {subsubsection}{\numberline {1.6.2}Fenêtres de quatre cases}{5}{subsubsection.1.6.2}%
+\contentsline {subsubsection}{\numberline {1.6.3}Pourquoi favoriser le centre ?}{6}{subsubsection.1.6.3}%
+\contentsline {section}{\numberline {2}Complexité de la méthode}{6}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Complexité de Min-Max}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Complexité avec alpha-bêta}{7}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Comparaison théorique}{7}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Implémentation de l'algorithme en Python pour résoudre un jeu de stratégie}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Technologies utilisées}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Organisation des fichiers}{8}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Représentation du plateau}{8}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Détection de victoire}{8}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Principe}{8}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Exemple de vérification horizontale}{8}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3}Gestion du match nul}{9}{subsubsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.5}Interface graphique}{9}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1}Choix de Pygame}{9}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2}Niveaux de difficulté}{10}{subsubsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.6}Stratégie de l'IA}{10}{subsection.3.6}%
+\contentsline {subsubsection}{\numberline {3.6.1}IA simple}{10}{subsubsection.3.6.1}%
+\contentsline {subsubsection}{\numberline {3.6.2}IA avec alpha-bêta}{10}{subsubsection.3.6.2}%
+\contentsline {subsubsection}{\numberline {3.6.3}Gestion des coups valides}{11}{subsubsection.3.6.3}%
+\contentsline {subsection}{\numberline {3.7}Tests et résultats}{11}{subsection.3.7}%
+\contentsline {subsubsection}{\numberline {3.7.1}Tests fonctionnels}{11}{subsubsection.3.7.1}%
+\contentsline {subsubsection}{\numberline {3.7.2}Exemple de blocage}{11}{subsubsection.3.7.2}%
+\contentsline {subsubsection}{\numberline {3.7.3}Exemple de victoire}{12}{subsubsection.3.7.3}%
+\contentsline {subsection}{\numberline {3.8}Analyse des résultats}{12}{subsection.3.8}%
+\contentsline {subsubsection}{\numberline {3.8.1}Comportement observé}{12}{subsubsection.3.8.1}%
+\contentsline {subsubsection}{\numberline {3.8.2}Impact de la profondeur}{13}{subsubsection.3.8.2}%
+\contentsline {subsubsection}{\numberline {3.8.3}Forces du projet}{13}{subsubsection.3.8.3}%
+\contentsline {subsubsection}{\numberline {3.8.4}Limites}{13}{subsubsection.3.8.4}%
+\contentsline {subsection}{\numberline {3.9}Difficultés rencontrées}{13}{subsection.3.9}%
+\contentsline {subsubsection}{\numberline {3.9.1}Gestion de l'explosion combinatoire}{13}{subsubsection.3.9.1}%
+\contentsline {subsubsection}{\numberline {3.9.2}Conception de l'heuristique}{13}{subsubsection.3.9.2}%
+\contentsline {subsubsection}{\numberline {3.9.3}Synchronisation avec l'interface}{14}{subsubsection.3.9.3}%
+\contentsline {subsection}{\numberline {3.10}Perspectives d'amélioration}{14}{subsection.3.10}%
+\contentsline {subsubsection}{\numberline {3.10.1}Mémoïsation des états}{14}{subsubsection.3.10.1}%
+\contentsline {subsubsection}{\numberline {3.10.2}Amélioration de l'ordre des coups}{14}{subsubsection.3.10.2}%
+\contentsline {subsubsection}{\numberline {3.10.3}Modes de jeu supplémentaires}{14}{subsubsection.3.10.3}%
+\contentsline {subsubsection}{\numberline {3.10.4}Comparaison avec d'autres méthodes}{14}{subsubsection.3.10.4}%
+\contentsline {section}{\numberline {4}Conclusion}{14}{section.4}%

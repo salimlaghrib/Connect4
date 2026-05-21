@@ -27,36 +27,40 @@ LARGEUR = 960
 HAUTEUR = 720
 FPS     = 60
 
-# ─── Palette image : gris perle / teal / marine ───────────────
-FOND           = (232, 234, 240)   # fond gris perle
-FOND_PANNEAU   = (245, 246, 250)
+# ─── Palette claire et lisible : plateau / joueur / IA distincts ─────────────
+FOND           = (238, 241, 245)
+FOND_PANNEAU   = (255, 255, 255)
 
-GRILLE_FOND    = (255, 255, 255)
-GRILLE_BORD    = (210, 214, 224)
-CASE_VIDE      = (210, 214, 222)   # gris légèrement bleuté
-CASE_VIDE_OMB  = (190, 195, 207)
+GRILLE_FOND    = ( 28,  93, 170)
+GRILLE_BORD    = ( 13,  59, 120)
+CASE_VIDE      = (224, 232, 242)
+CASE_VIDE_OMB  = (183, 198, 218)
 
-# Joueur : teal vert menthe
-TEAL           = ( 46, 196, 160)   # #2EC4A0
-TEAL_CLAIR     = ( 90, 220, 190)
-TEAL_HL        = (160, 240, 220)
-TEAL_FONCE     = ( 28, 155, 125)
+# Joueur : jaune/or visible
+TEAL           = (245, 179,  36)
+TEAL_CLAIR     = (255, 211,  85)
+TEAL_HL        = (255, 238, 170)
+TEAL_FONCE     = (196, 127,  18)
 
-# IA : bleu marine
-MARINE         = ( 52,  68, 100)   # #344464
-MARINE_CLAIR   = ( 75,  95, 135)
-MARINE_HL      = (120, 145, 190)
-MARINE_FONCE   = ( 35,  48,  75)
+# IA : rouge/corail, bien separe du joueur
+MARINE         = (219,  62,  78)
+MARINE_CLAIR   = (242, 103, 115)
+MARINE_HL      = (255, 172, 178)
+MARINE_FONCE   = (159,  35,  52)
 
-# Accents
-ROSE_TITRE     = (237,  55, 155)   # rose bubbly "You Won!"
-ROSE_OMBRE     = (180,  20, 110)
+# Accents et textes
+BLEU_ACCENT    = ( 28,  93, 170)
+BLEU_FONCE     = ( 18,  44,  76)
+VERT_OK        = ( 42, 157, 143)
+ORANGE_NIVEAU  = (238, 151,  55)
+ROSE_TITRE     = (219,  62,  78)
+ROSE_OMBRE     = (159,  35,  52)
 BLANC          = (255, 255, 255)
-TEXTE_TITRE    = ( 40,  48,  70)
-TEXTE_CORPS    = ( 80,  92, 115)
-TEXTE_DOUX     = (150, 160, 180)
-VERT_BOUTON    = ( 46, 196, 160)
-ROUGE_BOUTON   = (220,  65,  65)
+TEXTE_TITRE    = ( 25,  38,  58)
+TEXTE_CORPS    = ( 65,  78,  98)
+TEXTE_DOUX     = (113, 128, 150)
+VERT_BOUTON    = ( 42, 157, 143)
+ROUGE_BOUTON   = (219,  62,  78)
 
 # ─── Polices ──────────────────────────────────────────────────
 def _police(noms, taille, gras=False):
@@ -82,15 +86,15 @@ NIVEAUX = {
     "Simple": {
         "profondeur": 1,
         "mode": "simple",
-        "couleur":  TEAL,
-        "couleur2": (220, 248, 242),
+        "couleur":  VERT_OK,
+        "couleur2": (228, 247, 244),
         "description": "Logique de base, idéal pour commencer."
     },
     "Moyen": {
         "profondeur": 4,
         "mode": "alphabeta",
-        "couleur":  (195, 140, 30),
-        "couleur2": (255, 248, 220),
+        "couleur":  ORANGE_NIVEAU,
+        "couleur2": (255, 243, 224),
         "description": "Minimax équilibré avec élagage α-β."
     },
     "Expert": {
@@ -109,10 +113,8 @@ NIVEAUX = {
 
 def dessiner_fond(ecran):
     ecran.fill(FOND)
-    # Petite grille de points discrets
-    for x in range(0, LARGEUR, 32):
-        for y in range(0, HAUTEUR, 32):
-            pygame.draw.circle(ecran, GRILLE_BORD, (x, y), 1)
+    pygame.draw.rect(ecran, (229, 234, 241), (0, 0, LARGEUR, 104))
+    pygame.draw.line(ecran, (207, 216, 229), (0, 104), (LARGEUR, 104), 1)
 
 
 def dessiner_texte(ecran, texte, police, couleur, pos, centre=False):
@@ -126,6 +128,28 @@ def dessiner_texte(ecran, texte, police, couleur, pos, centre=False):
     return rect
 
 
+def dessiner_texte_lignes(ecran, texte, police, couleur, x, y, largeur, interligne=6):
+    mots = texte.split()
+    lignes = []
+    courant = ""
+    for mot in mots:
+        test = mot if not courant else f"{courant} {mot}"
+        if police.size(test)[0] <= largeur:
+            courant = test
+        else:
+            if courant:
+                lignes.append(courant)
+            courant = mot
+    if courant:
+        lignes.append(courant)
+
+    yy = y
+    for ligne in lignes:
+        dessiner_texte(ecran, ligne, police, couleur, (x, yy))
+        yy += police.get_height() + interligne
+    return yy
+
+
 def eclaircir(c, a): return tuple(min(255, v + a) for v in c)
 def assombrir(c, a):  return tuple(max(0,   v - a) for v in c)
 
@@ -136,13 +160,13 @@ def ombre_rect(ecran, rect, rayon=14, decal=5, alpha=38):
     ecran.blit(s, (rect.x - decal, rect.y + decal // 2))
 
 
-def carte(ecran, rect, fond=BLANC, bord=GRILLE_BORD, rayon=16):
+def carte(ecran, rect, fond=BLANC, bord=GRILLE_BORD, rayon=10):
     ombre_rect(ecran, rect, rayon=rayon)
     pygame.draw.rect(ecran, fond, rect, border_radius=rayon)
     pygame.draw.rect(ecran, bord, rect, 1, border_radius=rayon)
 
 
-def bouton(ecran, rect, texte, couleur, texte_c=BLANC, hover=False, rayon=12):
+def bouton(ecran, rect, texte, couleur, texte_c=BLANC, hover=False, rayon=8):
     fond = eclaircir(couleur, 20) if hover else couleur
     ombre_rect(ecran, rect, rayon=rayon, decal=3, alpha=28)
     pygame.draw.rect(ecran, fond, rect, border_radius=rayon)
@@ -245,21 +269,20 @@ def dessiner_plateau(ecran, plateau, col_survol=None, piece_temp=None, cases_gag
         cases_gagnantes = []
     gagnantes_set = set(cases_gagnantes)
 
-    # Ombre planche
-    ombre = pygame.Surface((BOARD_W + 20, BOARD_H + 20), pygame.SRCALPHA)
-    pygame.draw.rect(ombre, (0, 0, 0, 30), ombre.get_rect(), border_radius=24)
-    ecran.blit(ombre, (BOARD_X - 4, BOARD_Y + 10))
+    # Plateau bleu : zone de jeu clairement separee des panneaux blancs.
+    ombre = pygame.Surface((BOARD_W + 18, BOARD_H + 18), pygame.SRCALPHA)
+    pygame.draw.rect(ombre, (0, 0, 0, 34), ombre.get_rect(), border_radius=18)
+    ecran.blit(ombre, (BOARD_X - 4, BOARD_Y + 8))
 
-    # Fond planche blanc arrondi
     rect_g = pygame.Rect(BOARD_X, BOARD_Y, BOARD_W, BOARD_H)
-    pygame.draw.rect(ecran, BLANC, rect_g, border_radius=20)
-    pygame.draw.rect(ecran, GRILLE_BORD, rect_g, 2, border_radius=20)
+    pygame.draw.rect(ecran, GRILLE_FOND, rect_g, border_radius=14)
+    pygame.draw.rect(ecran, GRILLE_BORD, rect_g, 3, border_radius=14)
 
     # Surbrillance colonne
     if col_survol is not None:
         x = BOARD_X + col_survol * CELL
         sv = pygame.Surface((CELL, BOARD_H), pygame.SRCALPHA)
-        sv.fill((46, 196, 160, 22))
+        sv.fill((255, 255, 255, 36))
         ecran.blit(sv, (x, BOARD_Y))
 
     # Cases et jetons
@@ -268,9 +291,9 @@ def dessiner_plateau(ecran, plateau, col_survol=None, piece_temp=None, cases_gag
             x, y = centre_case(ligne, col)
             piece = plateau[ligne][col]
 
-            # Creux (inset)
-            pygame.draw.circle(ecran, CASE_VIDE_OMB, (x + 2, y + 3), RAYON + 4)
-            pygame.draw.circle(ecran, CASE_VIDE,     (x, y), RAYON + 2)
+            pygame.draw.circle(ecran, GRILLE_BORD, (x + 2, y + 3), RAYON + 5)
+            pygame.draw.circle(ecran, CASE_VIDE_OMB, (x, y), RAYON + 3)
+            pygame.draw.circle(ecran, CASE_VIDE, (x, y), RAYON)
 
             if piece != VIDE:
                 est_gagnante = (ligne, col) in gagnantes_set
@@ -279,7 +302,8 @@ def dessiner_plateau(ecran, plateau, col_survol=None, piece_temp=None, cases_gag
     # Numéros de colonnes
     for col in range(COLS):
         x = BOARD_X + col * CELL + CELL // 2
-        dessiner_texte(ecran, str(col + 1), POLICE_CHIFFRE, TEXTE_DOUX,
+        pygame.draw.circle(ecran, (220, 228, 239), (x, BOARD_Y + BOARD_H + 16), 15)
+        dessiner_texte(ecran, str(col + 1), POLICE_CHIFFRE, TEXTE_CORPS,
                        (x, BOARD_Y + BOARD_H + 14), centre=True)
 
     # Jeton en animation
@@ -298,48 +322,51 @@ def dessiner_hud(ecran, plateau, niveau_nom, tour_joueur, message,
 
     # ── Titre ──
     dessiner_texte(ecran, "Puissance 4", POLICE_TITRE, TEXTE_TITRE, (BOARD_X, 20))
-    pygame.draw.line(ecran, TEAL, (BOARD_X, 80), (BOARD_X + 300, 80), 3)
-    dessiner_texte(ecran, "Joueur  vs  Ordinateur", POLICE_PETIT, TEXTE_DOUX, (BOARD_X, 88))
+    pygame.draw.line(ecran, BLEU_ACCENT, (BOARD_X, 82), (BOARD_X + 300, 82), 4)
+    dessiner_texte(ecran, "Joueur jaune vs IA rouge",
+                   POLICE_PETIT, TEXTE_DOUX, (BOARD_X, 90))
 
     # ── Panneau latéral ──
     panneau = pygame.Rect(PANEL_X, 50, 262, 610)
-    carte(ecran, panneau, fond=FOND_PANNEAU, bord=GRILLE_BORD, rayon=18)
+    carte(ecran, panneau, fond=FOND_PANNEAU, bord=(201, 211, 224), rayon=10)
 
     entete = pygame.Rect(PANEL_X, 50, 262, 46)
-    pygame.draw.rect(ecran, TEAL, entete, border_radius=18)
-    pygame.draw.rect(ecran, TEAL, pygame.Rect(PANEL_X, 72, 262, 24))
+    pygame.draw.rect(ecran, BLEU_FONCE, entete, border_radius=10)
+    pygame.draw.rect(ecran, BLEU_FONCE, pygame.Rect(PANEL_X, 72, 262, 24))
     dessiner_texte(ecran, "Tableau de bord", POLICE_TEXTE_GRAS, BLANC, (PANEL_X + 18, 62))
 
     # ── Bloc Tour ──
-    t_rect = pygame.Rect(PANEL_X + 14, 112, 234, 120)
-    fond_t = (220, 248, 244) if tour_joueur else (240, 240, 250)
-    carte(ecran, t_rect, fond=fond_t, bord=GRILLE_BORD, rayon=12)
-    dessiner_texte(ecran, "TOUR ACTUEL", POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 130))
+    t_rect = pygame.Rect(PANEL_X + 14, 112, 234, 116)
+    fond_t = (255, 248, 225) if tour_joueur else (255, 235, 238)
+    bord_t = TEAL if tour_joueur else MARINE
+    carte(ecran, t_rect, fond=fond_t, bord=bord_t, rayon=8)
+    pygame.draw.rect(ecran, bord_t, pygame.Rect(t_rect.x, t_rect.y, 6, t_rect.h), border_radius=5)
+    dessiner_texte(ecran, "TOUR ACTUEL", POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 128))
 
     if tour_joueur:
-        pygame.draw.circle(ecran, TEAL, (PANEL_X + 36, 172), 10)
-        dessiner_texte(ecran, "Joueur", POLICE_STAT, TEAL, (PANEL_X + 54, 170))
+        pygame.draw.circle(ecran, TEAL, (PANEL_X + 40, 170), 14)
+        dessiner_texte(ecran, "Joueur", POLICE_STAT, TEAL_FONCE, (PANEL_X + 62, 160))
     else:
-        pygame.draw.circle(ecran, MARINE, (PANEL_X + 36, 172), 10)
-        dessiner_texte(ecran, "Ordinateur", POLICE_SOUS_TITRE, TEXTE_CORPS, (PANEL_X + 54, 170))
+        pygame.draw.circle(ecran, MARINE, (PANEL_X + 40, 170), 14)
+        dessiner_texte(ecran, "Ordinateur", POLICE_SOUS_TITRE, MARINE_FONCE, (PANEL_X + 62, 166))
 
-    dessiner_texte(ecran, "● Teal = Toi  ● Marine = IA",
-                   POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 212))
+    dessiner_texte(ecran, "Jaune = toi   Rouge = IA",
+                   POLICE_PETIT, TEXTE_CORPS, (PANEL_X + 28, 204))
 
     # ── Bloc Niveau ──
     niveau = NIVEAUX[niveau_nom]
-    n_rect = pygame.Rect(PANEL_X + 14, 232, 234, 108)
-    carte(ecran, n_rect, fond=niveau["couleur2"], bord=GRILLE_BORD, rayon=12)
-    dessiner_texte(ecran, "NIVEAU", POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 244))
-    dessiner_texte(ecran, niveau_nom, POLICE_STAT, niveau["couleur"], (PANEL_X + 28, 264))
+    n_rect = pygame.Rect(PANEL_X + 14, 244, 234, 102)
+    carte(ecran, n_rect, fond=niveau["couleur2"], bord=niveau["couleur"], rayon=8)
+    dessiner_texte(ecran, "NIVEAU IA", POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 256))
+    dessiner_texte(ecran, niveau_nom, POLICE_STAT, niveau["couleur"], (PANEL_X + 28, 274))
     mode_txt = ("IA simple" if niveau["mode"] == "simple"
                 else f"Alpha-bêta prof. {niveau['profondeur']}")
-    dessiner_texte(ecran, mode_txt, POLICE_PETIT, TEXTE_CORPS, (PANEL_X + 28, 308))
+    dessiner_texte(ecran, mode_txt, POLICE_PETIT, TEXTE_CORPS, (PANEL_X + 28, 318))
 
     # ── Bloc Stats ──
-    s_rect = pygame.Rect(PANEL_X + 14, 358, 234, 92)
-    carte(ecran, s_rect, fond=BLANC, bord=GRILLE_BORD, rayon=12)
-    dessiner_texte(ecran, "STATISTIQUES", POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 370))
+    s_rect = pygame.Rect(PANEL_X + 14, 362, 234, 92)
+    carte(ecran, s_rect, fond=(248, 250, 252), bord=(207, 216, 229), rayon=8)
+    dessiner_texte(ecran, "PARTIE", POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 374))
     nb_libres = len(colonnes_valides(plateau))
     coups     = int((plateau != VIDE).sum())
     dessiner_texte(ecran, f"{nb_libres} col. libres",
@@ -348,30 +375,33 @@ def dessiner_hud(ecran, plateau, niveau_nom, tour_joueur, message,
                    POLICE_TEXTE, TEXTE_DOUX, (PANEL_X + 28, 422))
 
     # ── Bloc Message ──
-    m_rect = pygame.Rect(PANEL_X + 14, 468, 234, 74)
-    carte(ecran, m_rect, fond=(230, 248, 244), bord=TEAL, rayon=12)
-    pygame.draw.rect(ecran, TEAL,
-                     pygame.Rect(PANEL_X + 14, 468, 5, 74), border_radius=4)
-    dessiner_texte(ecran, message, POLICE_TEXTE_GRAS, TEXTE_TITRE, (PANEL_X + 28, 482))
-    dessiner_texte(ecran, "Clique une colonne", POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 28, 512))
+    m_rect = pygame.Rect(PANEL_X + 14, 472, 234, 88)
+    msg_couleur = BLEU_ACCENT if tour_joueur else MARINE
+    carte(ecran, m_rect, fond=(239, 246, 255), bord=msg_couleur, rayon=8)
+    pygame.draw.rect(ecran, msg_couleur,
+                     pygame.Rect(PANEL_X + 14, 472, 6, 88), border_radius=5)
+    dessiner_texte_lignes(ecran, message, POLICE_TEXTE_GRAS, TEXTE_TITRE,
+                          PANEL_X + 30, 486, 198, interligne=2)
+    aide = "Clique une colonne" if tour_joueur else "Patiente pendant le calcul"
+    dessiner_texte(ecran, aide, POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 30, 530))
 
     # Légende couleurs
     lg = PANEL_X + 14
-    ly = 562
+    ly = 580
     pygame.draw.circle(ecran, TEAL, (lg + 8, ly + 8), 8)
     dessiner_texte(ecran, "Joueur", POLICE_PETIT, TEXTE_CORPS, (lg + 22, ly))
-    pygame.draw.circle(ecran, MARINE, (lg + 130, ly + 8), 8)
-    dessiner_texte(ecran, "Ordinateur", POLICE_PETIT, TEXTE_CORPS, (lg + 144, ly))
+    pygame.draw.circle(ecran, MARINE, (lg + 126, ly + 8), 8)
+    dessiner_texte(ecran, "IA", POLICE_PETIT, TEXTE_CORPS, (lg + 140, ly))
 
     dessiner_texte(ecran, "[Échap] Menu principal",
-                   POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 14, 594))
+                   POLICE_PETIT, TEXTE_DOUX, (PANEL_X + 14, 618))
 
     # ── Prévisualisation ──
     if tour_joueur and col_survol is not None:
         x = BOARD_X + col_survol * CELL + CELL // 2
-        dessiner_jeton(ecran, x, 96, JOUEUR, rayon=22)
-        pygame.draw.polygon(ecran, TEAL,
-                            [(x - 8, 124), (x + 8, 124), (x, 136)])
+        dessiner_jeton(ecran, x, 114, JOUEUR, rayon=20)
+        pygame.draw.polygon(ecran, TEAL_FONCE,
+                            [(x - 8, 134), (x + 8, 134), (x, 142)])
 
     dessiner_plateau(ecran, plateau, col_survol, piece_temp, cases_gagnantes)
     pygame.display.flip()
@@ -540,25 +570,26 @@ def ecran_choix_niveau(ecran):
         souris = pygame.mouse.get_pos()
         dessiner_fond(ecran)
 
-        # Titre bubbly
-        _draw_bubbly_text(ecran, "Puissance 4", POLICE_TITRE, TEAL, TEAL_FONCE,
-                          (LARGEUR // 2, 62))
-        pygame.draw.line(ecran, TEAL,
-                         (LARGEUR // 2 - 130, 98), (LARGEUR // 2 + 130, 98), 3)
+        # Titre principal net : pas d'ombre forte pour eviter l'effet de texte double.
+        dessiner_texte(ecran, "Puissance 4", POLICE_TITRE, BLEU_FONCE,
+                       (LARGEUR // 2, 60), centre=True)
+        pygame.draw.line(ecran, BLEU_ACCENT,
+                         (LARGEUR // 2 - 130, 98), (LARGEUR // 2 + 130, 98), 4)
         dessiner_texte(ecran, "Choisis ton niveau de difficulté",
-                       POLICE_TEXTE, TEXTE_DOUX, (LARGEUR // 2, 112), centre=True)
+                       POLICE_TEXTE, TEXTE_DOUX, (LARGEUR // 2, 124), centre=True)
 
         # Aperçu plateau
         prev = pygame.Rect(55, 168, 310, 280)
-        carte(ecran, prev, fond=BLANC, bord=GRILLE_BORD, rayon=18)
+        carte(ecran, prev, fond=GRILLE_FOND, bord=GRILLE_BORD, rayon=10)
 
         rayon_p = 22
         for r in range(4):
             for c in range(5):
                 px = prev.x + 44 + c * 56
                 py = prev.y + 44 + r * 56
-                pygame.draw.circle(ecran, CASE_VIDE_OMB, (px + 2, py + 3), rayon_p + 3)
-                pygame.draw.circle(ecran, CASE_VIDE, (px, py), rayon_p + 2)
+                pygame.draw.circle(ecran, GRILLE_BORD, (px + 2, py + 3), rayon_p + 4)
+                pygame.draw.circle(ecran, CASE_VIDE_OMB, (px, py), rayon_p + 2)
+                pygame.draw.circle(ecran, CASE_VIDE, (px, py), rayon_p)
 
         exemples = [
             (prev.x + 44,  prev.y + 220, JOUEUR),
@@ -570,18 +601,21 @@ def ecran_choix_niveau(ecran):
         for px, py, piece in exemples:
             dessiner_jeton(ecran, px, py, piece, rayon=rayon_p)
 
-        dessiner_texte(ecran, "● Joueur (Teal)", POLICE_PETIT, TEAL,
-                       (prev.x + 16, prev.y + 260))
-        dessiner_texte(ecran, "● Ordinateur (Marine)", POLICE_PETIT, MARINE,
-                       (prev.x + 16, prev.y + 282))
+        pygame.draw.rect(ecran, BLANC, (prev.x + 12, prev.y + 246, 286, 26), border_radius=6)
+        pygame.draw.circle(ecran, TEAL, (prev.x + 28, prev.y + 259), 7)
+        dessiner_texte(ecran, "Joueur", POLICE_PETIT, TEXTE_CORPS, (prev.x + 42, prev.y + 251))
+        pygame.draw.circle(ecran, MARINE, (prev.x + 146, prev.y + 259), 7)
+        dessiner_texte(ecran, "Ordinateur", POLICE_PETIT, TEXTE_CORPS, (prev.x + 160, prev.y + 251))
 
         # Règle rapide
         regle_r = pygame.Rect(55, 472, 310, 118)
-        carte(ecran, regle_r, fond=(220, 248, 244), bord=TEAL, rayon=14)
-        dessiner_texte(ecran, "Comment jouer ?", POLICE_TEXTE_GRAS, TEAL,
+        carte(ecran, regle_r, fond=(239, 246, 255), bord=BLEU_ACCENT, rayon=8)
+        pygame.draw.rect(ecran, BLEU_ACCENT, pygame.Rect(regle_r.x, regle_r.y, 6, regle_r.h),
+                         border_radius=5)
+        dessiner_texte(ecran, "Comment jouer ?", POLICE_TEXTE_GRAS, BLEU_ACCENT,
                        (regle_r.x + 16, regle_r.y + 14))
         for i, ligne in enumerate([
-            "Clique sur une colonne (1–7)",
+            "Clique sur une colonne (1-7)",
             "Aligne 4 jetons en ligne,",
             "en colonne ou en diagonale.",
         ]):
@@ -591,16 +625,19 @@ def ecran_choix_niveau(ecran):
         # Boutons de niveau
         dessiner_texte(ecran, "Choisir le niveau :",
                        POLICE_SOUS_TITRE, TEXTE_TITRE, (408, 170))
-        pygame.draw.line(ecran, GRILLE_BORD, (408, 198), (885, 198), 1)
+        pygame.draw.line(ecran, (207, 216, 229), (408, 198), (885, 198), 1)
 
         for i, (nom, data) in enumerate(NIVEAUX.items()):
             rect = pygame.Rect(408, 214 + i * 122, 477, 104)
             boutons[nom] = rect
             hover = rect.collidepoint(souris)
-            fond_btn = eclaircir(data["couleur2"], 8) if hover else data["couleur2"]
-            carte(ecran, rect, fond=fond_btn, bord=data["couleur"], rayon=14)
+            fond_btn = BLANC if not hover else data["couleur2"]
+            carte(ecran, rect, fond=fond_btn, bord=data["couleur"], rayon=8)
+            pygame.draw.rect(ecran, data["couleur"], pygame.Rect(rect.x, rect.y, 7, rect.h),
+                             border_radius=5)
 
-            pygame.draw.circle(ecran, data["couleur"], (rect.x + 34, rect.centery), 13)
+            pygame.draw.circle(ecran, data["couleur"], (rect.x + 36, rect.centery), 14)
+            pygame.draw.circle(ecran, BLANC, (rect.x + 36, rect.centery), 6)
 
             dessiner_texte(ecran, nom, POLICE_SOUS_TITRE, data["couleur"],
                            (rect.x + 58, rect.y + 16))
